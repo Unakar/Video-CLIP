@@ -9,7 +9,7 @@ copyright: Copyright &copy; 2024 Xie Tian
 nav:
   - Home: index.md
   - Project docs:
-    - FrameworkDesign: project_docs/项目设计.md
+    - FrameworkDesign: project docs/项目设计.md
   - Survey: 
     - CLIP4clip: survey/CLIP4clip.md
   - Tasks:
