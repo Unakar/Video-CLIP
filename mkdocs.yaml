@@ -8,8 +8,8 @@ copyright: Copyright &copy; 2024 Xie Tian
 # Page tree
 nav:
   - Home: index.md
-  - Project docs:
-    - FrameworkDesign: project docs/项目设计.md
+  - Project:
+    - FrameworkDesign: project/项目设计.md
   - Survey: 
     - CLIP4clip: survey/CLIP4clip.md
   - Tasks:
