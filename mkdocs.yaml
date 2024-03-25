@@ -69,6 +69,14 @@ theme:
     - toc.follow
     # - toc.integrate
 
+markdown_extensions:
+  - pymdownx.arithmatex:
+    generic: true
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js
+
 
 repo_name: Unakar/Video-CLIP
 repo_url: https://github.com/Unakar/Video-CLIP
