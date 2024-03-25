@@ -1,6 +1,6 @@
 # CLIP4Clip
 
-## Abstruct
+## Abstract
 
 在本文中，作者提出了一个 CLIP4Clip 模型，以端到端的方式将 CLIP 模型的知识转移到视频语言检索中。在本文中，作者通过实验研究了以下几个问题：
 
