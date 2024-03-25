@@ -39,10 +39,9 @@
 ## Framework
 
 给定一组视频 $\mathcal{V}$（或视频片段）和一组文本 $\mathcal{T}$，模型的目标是学习函数 $s(v_i,t_j)$ 来计算视频（或视频片段）$v_i\in\mathcal{V}$ 与文本 $t_j\in\mathcal{T}$ 之间的相似度。根据文本到视频检索中的相似性得分对给定查询本文的所有视频（或视频片段）进行排序，或者在视频到文本检索任务中对给定查询视频（或视频片段）的所有文本进行排序。$s(v_i,t_j)$ 的目标是计算相关视频文本对的高相似度分数和不相关视频文本对的低相似度分数。
+<img src="../../assets/Framework7.jpg" width="90%">
 
-![[../assets/Framework7.jpg]]
-
-![[../assets/Framework_Similarity.jpg]]
+<img src="../../assets/Framework_Similarity.jpg" width="90%">
 
 CLIP4Clip 的框架包括三个组件，包括两个单模态编码器和一个相似性计算器。该模型采用视频-文本对作为输入。对于输入视频，我们首先将输入视频采样为有序的帧（图像）。接下来，这些图像帧被重新整形为一系列展平的 2D 块。这些补丁被映射到具有线性补丁嵌入层的 1D 嵌入序列，并被输入到图像编码器以如在 ViT 中表示。最后，相似度计算器预测这些帧的文本表示和表示序列之间的相似度得分。在这项工作中，我们研究了三种类型的相似性计算器，包括无参数、顺序和紧类型表示余弦相似性。我们用 CLIP（ViT-B/32）对两个单模编码器进行了初始化。
 
@@ -53,10 +52,10 @@ CLIP4Clip 的框架包括三个组件，包括两个单模态编码器和一个�
 为了获得视频表示，首先从视频片段中提取帧，然后通过视频编码器对其进行编码，以获得一系列特征。在本文中，作者采用 ViT-B/32 作为视频编码器，具有 12 层，patch 大小为 32。具体地，作者使用预训练的 CLIP（VIT-B／32）作为主干网络，并且主要考虑将图像表示转移到视频表示。
 
 ViT 首先提取非重叠图像块，然后用线性投影转换为一维的 token，并利用 Transformer 架构对输入图像的每个 patch 之间的交互进行建模，以获得最终的表示。在 CLIP 的 ViT 之后，作者使用 \[class\] token 的输出作为图像表示。对于视频的输入帧序列 $v_i=\{v_i^1,v_i^2,\cdots,v_i^{|v_i|}\}$，生成的特征可以表示为 $\mathbf{Z}_i=\{\mathbf{z}_i^1,\mathbf{z}_i^2,\cdots,\mathbf{z}_i^{|v_i|}\}$。
+<img src="../../assets/linear_2d.jpg" width="90%">
 
-![[../assets/linear_2d.jpg]]
+<img src="../../assets/linear_3d.jpg" width="90%">
 
-![[../assets/linear_3d.jpg]]
 
 在上图中，作者展示了 Patch 线性投影模块中研究了两种类型的线性投影，分别命名为 2D 线性和 3D 线性。（a）将 ViT 的 Patch 的线性投影视为二维线性投影，独立嵌入每个二维帧patch。这样的二维线性模型忽略了帧之间的时间信息。（b）因此，作者研究了的 3D 线性投影，以增强时间特征提取。三维线性投影会跨时间的 patch。具体地说，三维线性使用以 $[t\times h\times w]$ 的核作为线性的三维卷积代替二维线性中 $[h\times w]$ 的核，其中 t、h 和 w 分别为时间、高度和宽度。
 
@@ -65,8 +64,8 @@ ViT 首先提取非重叠图像块，然后用线性投影转换为一维的 tok
 作者直接从 CLIP 中的文本编码器来生成文本表示，其文本编码器是一种 Transformer 结构。这是一个 12 层，通道为 512 的模型，有 8 个注意力头。在 CLIP 之后，\[EOS\] token 处 Transformer 最高层的激活被视为文本的特征表示。对于文本 $t_j\in\mathcal{T}$，其特征表示为 $\mathbf{w}_j$。
 
 ### Similarity Calculator
+<img src="../../assets/Framework_Similarity.jpg" width="90%">
 
-![[../assets/Framework_Similarity.jpg]]
 
 在提取视频表示 $\mathbf{Z}_i=\{\mathbf{z}_i^1,\mathbf{z}_i^2,\cdots,\mathbf{z}_i^{|v_i|}\}$ 和文本表示 $\mathbf{w}_j$ 之后，关键步骤是相似度计算。由于本文的模型是基于预训练的图像-文本模型构建的，因此应该在相似度计算模块中小心地添加新的可学习权重。如果没有权重初始化，很难进行学习，并且可能会影响使用反向传播的预训练模型训练的性能。因此，作者根据模块是否引入新参数进行学习，将相似度计算器的机制分为三类。无参数方法，即平均池化，在没有新参数的情况下融合视频表示。另外，作者还提出两种方法引入了新的权值来学习，包括具有不同大小的新权值的序列型方法和紧密型方法 。上图说明了三种机制的详细结构。无参数类型和序列类型的相似度计算器属于松散类型，采用两个单独的分支分别用于视频和文本表示来计算余弦相似度。而紧密型相似性计算器使用 Transformer 模型进行多模态交互，并通过线性投影进一步计算相似性，两者都包含新的权重以供学习。
 
@@ -96,9 +95,9 @@ $$\widetilde{\mathbf{U}}_i=\text{Transformer-Enc}(\mathbf{U}_i+\mathbf{P}+\mathb
 
 给定一个 Batch。即 B 个视频- 文本或视频片段-文本对，模型需要生成并优化 B×B 相似度矩阵。作者使用这些相似度分数上的对称交叉熵损失来训练模型的参数：
 
-$$\mathcal{L}_{v2t} = -\frac{1}{B} \sum_i^B{\log \frac{\exp(s(v_i, t_i))}{\sum_{j=1}^B{\exp(s(v_i, t_j)}}}$$
+$$\mathcal{L}_{v2t} = -\frac{1}{B} \sum_i^B{\log \frac{\exp(s(v_i, t_i))}{\sum_{j=1}^B{\exp(s(v_i, t_j))}}}$$
 
-$$\mathcal{L}_{t2v} = -\frac{1}{B} \sum_i^B{\log \frac{\exp(s(v_i, t_i))}{\sum_{j=1}^B{\exp(s(v_j, t_i)}}}$$
+$$\mathcal{L}_{t2v} = -\frac{1}{B} \sum_i^B{\log \frac{\exp(s(v_i, t_i))}{\sum_{j=1}^B{\exp(s(v_j, t_i))}}}$$
 
 $$\mathcal{L} = \mathcal{L}_{v2t} + \mathcal{L}_{t2v}$$
 
