@@ -19,7 +19,8 @@ nav:
   - Project:
     - FrameworkDesign: project/项目设计.md
   - Survey: 
-    - CLIP4clip: survey/CLIP4clip.md
+    - CLIP4Clip: survey/CLIP4Clip.md
+    - CLIP-ViP: survey/CLIP-ViP.md
   - Tasks:
     - 第一周: Tasks/第一周任务.md
     
