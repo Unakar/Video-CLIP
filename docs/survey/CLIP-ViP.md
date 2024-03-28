@@ -22,7 +22,7 @@
 
 为了研究不同数据尺度的有效性，我们使用 CLIP-ViT-B/32 模型作为基础图像-文本预训练模型，并采用 MeanPool 进行视频自适应，如 CLIP4Clip，将多帧特征平均为视频特征。使用了两个开放域视频文本数据集：WebVid-2.5M，具有 250 万对；HD-VILA-100M，具有 100M 对。我们还采用包含随机 10% 数据的 HD-VILA-100M 的子集（即HD-VILA-10M）作为中间设置。我们在所有设置上运行相同数量的步骤，相当于 HD-VILA-100M 上的一个 epoch。我们从每个视频中均匀采样 12 帧，并将第 5 节中描述的相同超参数应用于所有设置。
 
-![[pre_curve.jpg]]
+<img src="../../assets/pre_curve.jpg" width="90%">
 
 在后预训练过程中，我们通过微调 MSR-VTT 文本到视频检索任务来评估预训练的模型。图 1 显示了性能趋势。我们观察到一种过拟合现象，即连续的后预训练会导致性能下降。对于较小的数据（例如 WebVid-2.5M 和 HD-VILA-10M），下降更为显著。由于 CLIP 是在 4 亿个图像-文本对上进行预训练的，因此在小数据上的进一步训练会使模型倾向于过度拟合新数据，而从图像-文本配对中学习到的隐含知识正在退化。因此，性能将下降，甚至比直接使用 CLIP 更糟。因此，我们采用 HD-VILA-100M，因为它的规模大，种类多样。
 
@@ -82,7 +82,7 @@ $$\begin{aligned}
 
 其中 $s_i\in S$ 和 $c_i\in C$。$\mathcal{L}_{V\leftrightarrow S,C}$ 中的 $\mathcal{L}_{t2v}$ 等于（c）。我们将所有变体与基线 $\mathcal{L}_{V\leftrightarrow S}$ 进行比较，并在第 5 节中报告结果。
 
-![[clip-vip_figure.jpg]]
+<img src="../../assets/clip-vip_figure.jpg" width="90%">
 
 CLIP-ViP 的框架，具有文本编码器和视觉编码器。以视频、帧、字幕、辅助字幕的特征 $V,F,S,C$ 为输入，研究了一系列多源跨模态学习变体，以探索更好的表征学习损失：（a）$\mathcal{L}_{V\leftrightarrow S}+\mathcal{L}_{F\leftrightarrow C}$（b） $\mathcal{L}_{V\leftrightarrow S}+\mathcal{L}_{V\leftrightarrow C}$（c） $\mathcal{L}_{V\leftrightarrow S}+\mathcal{L}_{V\leftrightarrow C}+\mathcal{L}_{F\leftrightarrow C}$（d） $\mathcal{L}_{V\leftrightarrow S,C}+\mathcal{L}_{F\leftrightarrow C}$。在视觉编码器中，提出了视频代理令牌和 ViP 引导的注意力机制来将 CLIP 转移到视频域。
 
