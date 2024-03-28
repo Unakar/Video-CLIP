@@ -21,6 +21,7 @@ nav:
   - Survey: 
     - CLIP4Clip: survey/CLIP4Clip.md
     - CLIP-ViP: survey/CLIP-ViP.md
+    - Vita-Clip: survey/Vita-CLIP.md
   - Tasks:
     - 第一周: Tasks/第一周任务.md
     
