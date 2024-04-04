@@ -50,7 +50,97 @@ Global Prompt Tokens：$G^{(l)}$是随机初始化的可学习向量，用来为
 Local Prompt Tokens：$L^{(l)}=[l_1^{(l)},...,l_T^{(l)}]$也是随机初始化的可学习向量，取决于各自的分类token{CLS}，用于将每帧判别信息传递给CLIP中的其余帧。
 
 ## Code Analysis
-等我在colab整完CLIP再说，到时候看看代码上有没有特别值得一提的地方
+主要针对几个关键点的代码贴一下：
+global prompts:
+···
+def _initialize_global_prompts(self, patch_size, prompt_dim):
+        val = math.sqrt(6. / float(3 * reduce(mul, patch_size, 1) + prompt_dim))
+        # xavier_uniform initialization
+        nn.init.uniform_(self.global_prompts.data, -val, val)
+
+if self.use_global_prompts:
+            for i, blk in enumerate(self.blocks):
+                global_prompts = self.global_prompts[i].expand(B*T, -1, -1)
+
+                x = torch.cat((x[:, :1, :], global_prompts, x[:, 1:, :]), dim=1)
+                x = blk(x)
+                x = torch.cat((x[:, :1, :], x[:, self.num_global_prompts+1:, :]), dim=1)
+···
+
+local prompts and summary tokens：
+···
+init：
+        if self.use_summary_token or self.use_local_prompts:
+            self.cls_proj = nn.Linear(in_feature_dim, in_feature_dim)
+            self.num_frames = num_frames
+        
+        # for summary token we need a layer norm and attention
+        if self.use_summary_token:
+            self.summary_ln = LayerNorm(in_feature_dim)
+            self.summary_attn_layer = Attention(
+                                    q_in_dim=in_feature_dim, k_in_dim=in_feature_dim, v_in_dim=in_feature_dim,
+                                    qk_proj_dim=qkv_dim, v_proj_dim=qkv_dim, num_heads=num_heads, out_dim=in_feature_dim
+                                )
+
+        # for local prompts we init learnable tokens
+        if self.use_local_prompts:
+            self.local_prompts = nn.Parameter(torch.zeros(1, self.num_frames, in_feature_dim))
+            self._initialize_cls_prompts(patch_size, in_feature_dim)
+
+
+
+forward：
+        if self.use_summary_token:
+            summary_token_norm = self.summary_ln(cls_token_proj)
+            summary_token_attn = cls_token_proj + self.summary_attn_layer(summary_token_norm, summary_token_norm, summary_token_norm)
+            summary_token_attn_reshape = summary_token_attn.view(BT, 1, C)
+            x = torch.cat([x, summary_token_attn_reshape], dim=1)
+
+        if self.use_local_prompts:
+            local_prompts = self.local_prompts.expand(B, -1, -1)
+            # If train time frames and
+            # test time frames are not equal
+            if T != self.num_frames:
+                token_multiplier = T//self.num_frames
+                local_prompts = local_prompts.repeat(1,token_multiplier,1)
+            
+            # use additive conditioning
+            local_prompts = local_prompts + cls_token_proj
+
+            # repeat across frames
+            local_prompts = local_prompts.repeat_interleave(repeats=T, dim=0)
+            x = torch.cat((x[:, :1, :], local_prompts, x[:, 1:, :]), dim=1)
+···
+CSC Context：
+···
+tokenizer = _Tokenizer()
+        n_cls = len(classnames)
+        n_ctx = num_prompts
+        ctx_init = prompts_init
+        ctx_dim = text_model.ln_final.weight.shape[0]
+
+        if ctx_init:
+            # use given words to initialize context vectors
+            ctx_init = ctx_init.replace("_", " ")
+            n_ctx = len(ctx_init.split(" "))
+            prompt = tokenize(ctx_init)
+            with torch.no_grad():
+                embedding = text_model.token_embedding(prompt)
+            ctx_vectors = embedding[0, 1 : 1 + n_ctx, :]
+            prompt_prefix = ctx_init
+
+        else:
+            # random initialization
+            if CSC:
+                print("Initializing class-specific contexts")
+                ctx_vectors = torch.empty(n_cls, n_ctx, ctx_dim)
+            else:
+                print("Initializing a generic context")
+                ctx_vectors = torch.empty(n_ctx, ctx_dim)
+            nn.init.normal_(ctx_vectors, std=0.02)
+            prompt_prefix = " ".join(["X"] * n_ctx)
+···
+
 
 ## Result and Analysis
 Vita-CLIP以经典CLIP为baseline做了个消融实验，其中CLIP在K400数据集中（30 epochs，zero-shot，每个视频8帧）的accuracy为40.1%，添加了Class-Specific Context、全局视频级提示、局部帧级提示与summary token后提升到了80.51%
