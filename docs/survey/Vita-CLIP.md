@@ -52,7 +52,7 @@ Local Prompt Tokens：$L^{(l)}=[l_1^{(l)},...,l_T^{(l)}]$也是随机初始化�
 ## Code Analysis
 主要针对几个关键点的代码贴一下：
 global prompts:
-···
+```
 def _initialize_global_prompts(self, patch_size, prompt_dim):
         val = math.sqrt(6. / float(3 * reduce(mul, patch_size, 1) + prompt_dim))
         # xavier_uniform initialization
@@ -65,10 +65,10 @@ if self.use_global_prompts:
                 x = torch.cat((x[:, :1, :], global_prompts, x[:, 1:, :]), dim=1)
                 x = blk(x)
                 x = torch.cat((x[:, :1, :], x[:, self.num_global_prompts+1:, :]), dim=1)
-···
+```
 
 local prompts and summary tokens：
-···
+```
 init：
         if self.use_summary_token or self.use_local_prompts:
             self.cls_proj = nn.Linear(in_feature_dim, in_feature_dim)
@@ -110,9 +110,11 @@ forward：
             # repeat across frames
             local_prompts = local_prompts.repeat_interleave(repeats=T, dim=0)
             x = torch.cat((x[:, :1, :], local_prompts, x[:, 1:, :]), dim=1)
-···
+```
+
+
 CSC Context：
-···
+```
 tokenizer = _Tokenizer()
         n_cls = len(classnames)
         n_ctx = num_prompts
@@ -139,7 +141,7 @@ tokenizer = _Tokenizer()
                 ctx_vectors = torch.empty(n_ctx, ctx_dim)
             nn.init.normal_(ctx_vectors, std=0.02)
             prompt_prefix = " ".join(["X"] * n_ctx)
-···
+```
 
 
 ## Result and Analysis
