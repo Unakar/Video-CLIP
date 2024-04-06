@@ -16,7 +16,7 @@ class System_Backend:
     def build_page(self):
         with gr.Blocks(theme=gr.themes.Default(spacing_size=gr.themes.sizes.spacing_lg, radius_size=gr.themes.sizes.radius_lg,   text_size=gr.themes.sizes.text_lg)) as demo:
             gr.HTML(HTML)
-            gr.Markdown("## CLIP-base Model")
+            gr.Markdown("## Video Retrieval \n 谢天，陈鹤影，洪毓谦，张又升，林洛昊")
             with gr.Row():
                 with gr.Column():
                     inp = gr.Textbox(placeholder="Your Query Prompt Here")

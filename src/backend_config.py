@@ -25,7 +25,7 @@ HTML="""
     <body>
         <div class="container">
             <div class="text">
-                <h1 style="font-size: 32px;"><b> Video for All: Retrieval,Understanding & Style-Transfering </b></h1>
+                <h1 style="font-size: 32px;"><b> Video for All: </b>Retrieval,Understanding & Style-Transfering</h1>
             </div>
         </div>
     </body>
