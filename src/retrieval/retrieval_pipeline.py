@@ -1,17 +1,12 @@
 from .NearstNeighbors import NearestNeighbors
 from .video_database import VideoDataBase
-import os
-import numpy as np
-import pandas as pd
-from IPython import display
-import faiss
-import torch
+from .retrieval_config import CLIP_TOKENIZER,CLIP_MODEL
 from transformers import CLIPTokenizer, CLIPTextModelWithProjection
 
 class retrieval_pipeline:
     def __init__(self):
-        self.model = CLIPTextModelWithProjection.from_pretrained("/home/group2024-xietian/CLIP4Clip/clip4clip-webvid150k")
-        self.tokenizer = CLIPTokenizer.from_pretrained("/home/group2024-xietian/CLIP4Clip/clip4clip-webvid150k")
+        self.model = CLIPTextModelWithProjection.from_pretrained(CLIP_MODEL)
+        self.tokenizer = CLIPTokenizer.from_pretrained(CLIP_TOKENIZER)
         self.video_database = VideoDataBase()
         self.search = NearestNeighbors(n_neighbors=5, metric='binary', rerank_from=100)
         self.search.fit(self.video_database.database_binary,self.video_database.database)
