@@ -10,7 +10,7 @@ import retrieval.retrieval_pipeline as retrieval_pipeline
 class System_Backend:
     def __init__(self,topk=10,retrieval=retrieval_pipeline):
         self.topk = topk
-        self.retrieval = retrieval
+        self.retrieval = retrieval()
         self.page = self.build_page()
 
     def build_page(self):
