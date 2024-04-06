@@ -13,7 +13,7 @@ class retrieval_pipeline:
         self.model = CLIPTextModelWithProjection.from_pretrained("/home/group2024-xietian/CLIP4Clip/clip4clip-webvid150k")
         self.tokenizer = CLIPTokenizer.from_pretrained("/home/group2024-xietian/CLIP4Clip/clip4clip-webvid150k")
         self.video_database = VideoDataBase()
-        self.search = NearestNeighbors(n_neighbors=10, metric='cosine', rerank_from=-1)
+        self.search = NearestNeighbors(n_neighbors=5, metric='binary', rerank_from=100)
         self.search.fit(self.video_database.database_binary,self.video_database.database)
 
     def retrieval(self,search_sentence):
