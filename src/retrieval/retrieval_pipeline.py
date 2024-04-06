@@ -1,5 +1,5 @@
-from NearstNeighbors import NearestNeighbors
-from video_database import VideoDataBase
+from .NearstNeighbors import NearestNeighbors
+from .video_database import VideoDataBase
 import os
 import numpy as np
 import pandas as pd

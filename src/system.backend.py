@@ -4,7 +4,7 @@ Waiting for User Feedback.
 '''
 import gradio as gr
 from backend_config import *
-from retrieval import retrieval_pipeline
+import retrieval.retrieval_pipeline as retrieval_pipeline
 
 
 class System_Backend:

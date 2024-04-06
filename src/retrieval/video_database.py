@@ -4,7 +4,7 @@ Offer 2 different ways to deal with video data:
 2. vector-database (milvus) for new video to insert and delete
 '''
 import os
-from retrieval_config import *
+from .retrieval_config import *
 import numpy as np
 import pandas as pd
 class VideoDataBase:
