@@ -1,5 +1,5 @@
 """
-This script will compress the video to 3fps with width 224 (or height 224). Modify the variables for your customization.
+compress video to ffmpeg format
 """
 import os
 import argparse
